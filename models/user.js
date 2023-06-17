@@ -1,4 +1,7 @@
+/* eslint-disable import/no-extraneous-dependencies */
+/* eslint-disable no-param-reassign */
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
   firstName: {
@@ -11,11 +14,10 @@ const userSchema = new mongoose.Schema({
     minLength: 3,
     maxLength: 15,
   },
-  username: {
+  userName: {
     type: String,
     minLength: 3,
     maxLength: 15,
-    unique: true,
   },
   email: {
     type: String,
@@ -30,6 +32,17 @@ const userSchema = new mongoose.Schema({
     maxLength: 15,
     required: true,
   },
+}, {
+  toJSON: {
+    transform(doc, ret) {
+      delete ret.password;
+    },
+  },
+});
+
+userSchema.pre('save', function preSave(next) {
+  this.password = bcrypt.hashSync(this.password, 10);
+  next();
 });
 
 const User = mongoose.model('User', userSchema);

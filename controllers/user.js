@@ -1,4 +1,9 @@
+/* eslint-disable import/no-extraneous-dependencies */
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+
+const { JWT_SECRET } = process.env;
 
 const register = async (req, res) => {
   const user = new User({
@@ -17,13 +22,13 @@ const register = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  const { email } = req.body;
+  const { email, password } = req.body;
   try {
-    const result = await User.findOne({ email }).exec();
+    const user = await User.findOne({ email }).exec();
+    const result = bcrypt.compareSync(user.password, password);
     if (result) {
-      res.json(result);
-    } else {
-      res.status(400).json({ error: 'Not Found' });
+      const token = jwt.sign({ firstName: user.firstName, lastName: user.lastName, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
+      res.json(token);
     }
   } catch (error) {
     res.status(400).json({ error: 'Not Authenticated' });
