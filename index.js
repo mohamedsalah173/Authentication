@@ -9,7 +9,10 @@ const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost:27017/auth';
 
 mongoose.connect(MONGO_URL);
 
+app.use(express.json());
+
 app.use(router);
+console.log('wwww');
 
 app.use('*', (req, res) => {
   res.send('Error').status(400);
