@@ -12,7 +12,6 @@ mongoose.connect(MONGO_URL);
 app.use(express.json());
 
 app.use(router);
-console.log('wwww');
 
 app.use('*', (req, res) => {
   res.send('Error').status(400);
